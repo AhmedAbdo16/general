@@ -23,20 +23,25 @@ void SCA(int nFrames, int nPages, int *seq, int len);
 void FIFO(int nFrames, int nPages, int *seq, int len); 
 
 int main() { 
-    int seed, nPages, nFrames, lenOfSeq, *seq, algo_number, choose_another_alog; 
+    int seed, nPages, nFrames, lenOfSeq, algo_number, choose_another_alog; 
 
-  	cout << "This Program Simulate Page Replacement Alogrithms\n"; 
-  	cout << "Enter Number Of Pages : "; cin >> nPages; 
-  	cout << "Enter Number Of Frames : "; cin >> nFrames; 
-  	cout << "Enter Length Of Sequence : "; cin >> lenOfSeq;  
-    cout << "Enter The Seed Of sreand (seed): "; cin >> seed; 
-    srand(seed); 
+//  	cout << "This Program Simulate Page Replacement Alogrithms\n"; 
+//  	cout << "Enter Number Of Pages : "; cin >> nPages; 
+//  	cout << "Enter Number Of Frames : "; cin >> nFrames; 
+//  	cout << "Enter Length Of Sequence : "; cin >> lenOfSeq;  
+//    cout << "Enter The Seed Of sreand (seed): "; cin >> seed; 
+//    srand(seed); 
 
-    seq = new int[lenOfSeq]; 
+//    seq = new int[lenOfSeq]; 
 
-    for(int i=0; i<lenOfSeq; i++) { 
-        seq[i] = rand() % (nPages + 1); // 0<= rand() <= nPages 
-    }
+//    for(int i=0; i<lenOfSeq; i++) { 
+//        seq[i] = rand() % (nPages + 1); // 0<= rand() <= nPages 
+//    }
+	
+	nFrames = 3; 
+	nPages = 7; 
+	int seq[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1}; 
+	lenOfSeq = sizeof(seq) / sizeof(int); 
 
 
     do { 
@@ -649,29 +654,43 @@ int fifo(int *queue, int *ref_bit, int size)
 	int min; 
 
 	//continue until we find element that doesn't have second chance to be removed. 
-	while(1) 
-	{ 
+	cout << endl; 	
+	cout << "Pange No: \t";  
+	for(int i=0; i<=size; i++) printf("%-3d%s", i, " "); 
+	cout << endl;
+	cout << "Ref Bit: \t"; 	 
+	for(int i=0; i<=size; i++) printf("%-3d%s", ref_bit[i], " "); 
+	cout << endl;
+
+	cout << "Enterce Order: \t"; 	 
+	for(int i=0; i<=size; i++)
+		if(queue[i] >= size) printf("%-3s%s", " ", " ");
+		else printf("%-3d%s", queue[i], " ");  
+	cout << endl; 		  		 
+	// for(int i=0; i<=size; i++) cout << queue[i] << " ";
+	// cout << endl;
+	
+	while(1) { 
 		min = 0; 
-		for(int i=0; i<=size; i++) 
-		{ 
-			if((queue[min] > queue[i]) && (ref_bit[i] != -1))
-			{ 
-				min = i; 
+		for(int i=0; i<=size; i++) { 
+			if(ref_bit[min] == 1)
+			{
+				ref_bit[min] == -1;
+				min ++;   
+			}
+			if(ref_bit[min] != -1) 
+			{
+				if(queue[min] > queue[i]) min = i; 
 			}
 		}
-		//if ref_bit on, disable it. and loop again excluding it from the search next time by setting it to; 
-		if(ref_bit[min] == 1) 
-		{ 
-			ref_bit[min] = -1; 
-		}
-		else break; 
-	} 
-
-	for(int i=0; i<=size; i++) 
-	{ 
-		if(ref_bit[i] == -1) ref_bit[i] = 0; 
+		if(ref_bit[min] != -1 || ref_bit[min] == 1) break; 
 	}
-
+	
+	for(int i=0; i<=size; i++)
+		if(ref_bit[i] == -1) ref_bit[i] = 0; 
+	
+	printf("%s%-3d", "Removed Page: \t", min);
+	cout << endl;   
 	return min; 
 }
 
@@ -742,6 +761,7 @@ void SCA(int nFrames, int nPages, int *seq, int len)
 			{
 				int x = fifo(queue, ref_bit, nPages);
 				queue[x] = len;
+				ref_bit[x] = 0; 
 
 				replace(frames, nFrames, x, seq[i]); 
 				
@@ -755,6 +775,7 @@ void SCA(int nFrames, int nPages, int *seq, int len)
 				if(frames[j] == -1) cout << "# "; 
 				else cout << frames[j] << " "; 
 			}
+			
 			cout << endl; 
 		}
 	}
