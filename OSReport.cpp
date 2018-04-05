@@ -694,6 +694,7 @@ int fifo(int *queue, int *ref_bit, int size)
 	return min; 
 }
 
+
 /*Second Chance Algorithm */ 
 void SCA(int nFrames, int nPages, int *seq, int len)
 {
