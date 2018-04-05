@@ -683,7 +683,7 @@ int fifo(int *queue, int *ref_bit, int size)
 				if(queue[min] > queue[i]) min = i; 
 			}
 		}
-		if(ref_bit[min] != -1 || ref_bit[min] == 1) break; 
+		if(ref_bit[min] == 0) break; 
 	}
 	
 	for(int i=0; i<=size; i++)
