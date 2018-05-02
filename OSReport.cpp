@@ -4,11 +4,6 @@
 
 using namespace std;
 
-/*
-** Author: Muhammad Abulmajd
-** Helwan - Operating System
-*/
-
 /* Leaset Recently Used */ 
 void LRU(int nFrames, int nPages, int *seq, int len); 
 /* Most Freq. Used */
@@ -23,25 +18,20 @@ void SCA(int nFrames, int nPages, int *seq, int len);
 void FIFO(int nFrames, int nPages, int *seq, int len); 
 
 int main() { 
-    int seed, nPages, nFrames, lenOfSeq, algo_number, choose_another_alog; 
+    int seed, nPages, nFrames, lenOfSeq, *seq, algo_number, choose_another_alog; 
 
-//  	cout << "This Program Simulate Page Replacement Alogrithms\n"; 
-//  	cout << "Enter Number Of Pages : "; cin >> nPages; 
-//  	cout << "Enter Number Of Frames : "; cin >> nFrames; 
-//  	cout << "Enter Length Of Sequence : "; cin >> lenOfSeq;  
-//    cout << "Enter The Seed Of sreand (seed): "; cin >> seed; 
-//    srand(seed); 
+  	cout << "This Program Simulate Page Replacement Alogrithms\n"; 
+  	cout << "Enter Number Of Pages : "; cin >> nPages; 
+  	cout << "Enter Number Of Frames : "; cin >> nFrames; 
+  	cout << "Enter Length Of Sequence : "; cin >> lenOfSeq;  
+    cout << "Enter The Seed Of sreand (seed): "; cin >> seed; 
+    srand(seed); 
 
-//    seq = new int[lenOfSeq]; 
+    seq = new int[lenOfSeq]; 
 
-//    for(int i=0; i<lenOfSeq; i++) { 
-//        seq[i] = rand() % (nPages + 1); // 0<= rand() <= nPages 
-//    }
-	
-	nFrames = 3; 
-	nPages = 7; 
-	int seq[] = {7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1}; 
-	lenOfSeq = sizeof(seq) / sizeof(int); 
+    for(int i=0; i<lenOfSeq; i++) { 
+        seq[i] = rand() % (nPages + 1); // 0<= rand() <= nPages 
+    }
 
 
     do { 
@@ -82,8 +72,10 @@ int main() {
 }
 
 
-//////////////////////////////////////////////////////
-//utils functions that used in all algortithms
+/***********************************************
+				UTILS SECTION
+***********************************************/
+
 bool find(int *arr, int size, int element) 
 { 
 	bool isFound = false; 
@@ -111,9 +103,10 @@ void replace(int *arr, int size, int ele1, int ele2)
 	}
 }
 
-///////////////////////////////////////////////
-//	LRU SECTION
-///////////////////////////////////////////////
+
+/***********************************************
+				LRU SECTION
+***********************************************/
 
 int min(int *map, int size) 
 { 
@@ -148,7 +141,7 @@ void LRU(int nFrames, int nPages, int *seq, int len)
 	{
 		printFlag = 1; 
 		
-		isFound = find(frames, framesSize, seq[i]); // a pointer to the wanted element if exist, else to the end of the set
+		isFound = find(frames, framesSize, seq[i]);
 
 		if(framesSize < nFrames) 
 		{ 		
@@ -203,9 +196,9 @@ void LRU(int nFrames, int nPages, int *seq, int len)
 	cout << "LRU total miss = " << missCount << endl; 
 } 
 
-///////////////////////////////////////////////
-//	MFU SECTION
-///////////////////////////////////////////////
+/***********************************************
+				MFU SECTION
+***********************************************/
 
 int *_max(int *freq, int size)
 { 
@@ -342,9 +335,9 @@ void MFU(int nFrames, int nPages, int *seq, int len)
 	cout << "MFU total miss = " << missCount << endl;  
 }
 
-///////////////////////////////////////////////
-//	LFU SECTION
-///////////////////////////////////////////////
+/***********************************************
+				LFU SECTION
+***********************************************/
 
 int *lfu(int *freq, int size)
 { 
@@ -503,9 +496,9 @@ void LFU(int nFrames, int nPages, int *seq, int len)
 }
 
 
-///////////////////////////////////////////////
-//	OPT SECTION
-///////////////////////////////////////////////
+/***********************************************
+				OPT SECTION
+***********************************************/
 
 /* Optimal */
 void OPT(int nFrames, int nPages, int *seq, int len) 
@@ -645,149 +638,132 @@ void OPT(int nFrames, int nPages, int *seq, int len)
 }
 
 
-///////////////////////////////////////////////
-//	SCA SECTION
-///////////////////////////////////////////////
+// /***********************************************
+// 				SCA SECTION
+// ***********************************************/
 
-int fifo(int *queue, int *ref_bit, int size)
-{ 
-	int min; 
+// int fifo(int *queue, int *ref_bit, int size)
+// { 
+// 	int min; 
 
-	//continue until we find element that doesn't have second chance to be removed. 
-	cout << endl; 	
-	cout << "Pange No: \t";  
-	for(int i=0; i<=size; i++) printf("%-3d%s", i, " "); 
-	cout << endl;
-	cout << "Ref Bit: \t"; 	 
-	for(int i=0; i<=size; i++) printf("%-3d%s", ref_bit[i], " "); 
-	cout << endl;
+// 	//continue until we find element that doesn't have second chance to be removed. 
+// 	while(1) 
+// 	{ 
+// 		min = 0; 
+// 		for(int i=0; i<=size; i++) 
+// 		{ 
+// 			if((queue[min] > queue[i]) && (ref_bit[i] != -1))
+// 			{ 
+// 				min = i; 
+// 			}
+// 		}
+// 		//if ref_bit on, disable it. and loop again excluding it from the search next time by setting it to; 
+// 		if(ref_bit[min] == 1) 
+// 		{ 
+// 			ref_bit[min] = -1; 
+// 		}
+// 		else break; 
+// 	} 
 
-	cout << "Enterce Order: \t"; 	 
-	for(int i=0; i<=size; i++)
-		if(queue[i] >= size) printf("%-3s%s", " ", " ");
-		else printf("%-3d%s", queue[i], " ");  
-	cout << endl; 		  		 
-	// for(int i=0; i<=size; i++) cout << queue[i] << " ";
-	// cout << endl;
+// 	for(int i=0; i<=size; i++) 
+// 	{ 
+// 		if(ref_bit[i] == -1) ref_bit[i] = 0; 
+// 	}
+
+// 	return min; 
+// }
+
+// /*Second Chance Algorithm */ 
+// void SCA(int nFrames, int nPages, int *seq, int len)
+// {
+// 	/* 
+// 	Second chance algorithm is a FIFO variant, as we give the repeated elements that chance chance to 
+// 	be in frames, 
+// 	Ex: if we have page 2 in our frames and we require 2 again while the first still in the frames 
+// 	we give the 2 second chance by enabling its second chance bit
+
+// 	when removing pages/elements we search for the first entered (FI) and replace it, it have its second
+// 	chance bit enable we disable it and look for the next in line and remove it.
+// 	*/
 	
-	while(1) { 
-		min = 0; 
-		for(int i=0; i<=size; i++) { 
-			if(ref_bit[min] == 1)
-			{
-				ref_bit[min] == -1;
-				min ++;   
-			}
-			if(ref_bit[min] != -1) 
-			{
-				if(queue[min] > queue[i]) min = i; 
-			}
-		}
-		if(ref_bit[min] == 0) break; 
-	}
+// 	int missCount = 0, printFlag; 
 	
-	for(int i=0; i<=size; i++)
-		if(ref_bit[i] == -1) ref_bit[i] = 0; 
+// 	int ref_bit[nPages +1]; // ref_bit : Second Chance Bit; 
+// 	memset(ref_bit, 0, sizeof(ref_bit)); 
 	
-	printf("%s%-3d", "Removed Page: \t", min);
-	cout << endl;   
-	return min; 
-}
+// 	int queue[nPages + 1]; 
+// 	// memset(queue, len, sizeof(queue)); // as len out of the range of indeces
+// 	for(int i=0; i<=nPages; i++) queue[i] = len; 
 
+// 	int frames[nFrames], framesSize = 0; 
+// 	memset(frames, -1, sizeof(frames)); 
 
-/*Second Chance Algorithm */ 
-void SCA(int nFrames, int nPages, int *seq, int len)
-{
-	/* 
-	Second chance algorithm is a FIFO variant, as we give the repeated elements that chance chance to 
-	be in frames, 
-	Ex: if we have page 2 in our frames and we require 2 again while the first still in the frames 
-	we give the 2 second chance by enabling its second chance bit
+// 	bool isFound; 
 
-	when removing pages/elements we search for the first entered (FI) and replace it, it have its second
-	chance bit enable we disable it and look for the next in line and remove it.
-	*/
-	
-	int missCount = 0, printFlag; 
-	
-	int ref_bit[nPages +1]; // ref_bit : Second Chance Bit; 
-	memset(ref_bit, 0, sizeof(ref_bit)); 
-	
-	int queue[nPages + 1]; 
-	// memset(queue, len, sizeof(queue)); // as len out of the range of indeces
-	for(int i=0; i<=nPages; i++) queue[i] = len; 
+// 	// set<int> frames; 
+// 	// set<int>::iterator isFound; 
 
-	int frames[nFrames], framesSize = 0; 
-	memset(frames, -1, sizeof(frames)); 
+// 	for(int i=0; i<len; i++) 
+// 	{ 
+// 		printFlag = 1;
 
-	bool isFound; 
+// 		isFound = find(frames, framesSize, seq[i]); 
 
-	// set<int> frames; 
-	// set<int>::iterator isFound; 
+// 		//frames is not full 
+// 		if(framesSize < nFrames) 
+// 		{
+// 			//hit 
+// 			if(isFound == true) 
+// 			{ 
+// 				ref_bit[seq[i]] = 1;
+// 				printFlag = 0; 
+// 			} 
+// 			//miss
+// 			else
+// 			{ 
+// 				frames[framesSize++] = seq[i];  
+// 				queue[seq[i]] = i;
+// 				missCount++;  
+// 			}
+// 		}
+// 		//frames is full 
+// 		else
+// 		{ 
+// 			//Hit 
+// 			if(isFound == true)
+// 			{ 
+// 				ref_bit[seq[i]] = 1;
+// 				printFlag = 0; 
+// 			}
+// 			//Miss
+// 			else
+// 			{
+// 				int x = fifo(queue, ref_bit, nPages);
+// 				queue[x] = len;
 
-	for(int i=0; i<len; i++) 
-	{ 
-		printFlag = 1;
-
-		isFound = find(frames, framesSize, seq[i]); 
-
-		//frames is not full 
-		if(framesSize < nFrames) 
-		{
-			//hit 
-			if(isFound == true) 
-			{ 
-				ref_bit[seq[i]] = 1;
-				printFlag = 0; 
-			} 
-			//miss
-			else
-			{ 
-				frames[framesSize++] = seq[i];  
-				queue[seq[i]] = i;
-				missCount++;  
-			}
-		}
-		//frames is full 
-		else
-		{ 
-			//Hit 
-			if(isFound == true)
-			{ 
-				ref_bit[seq[i]] = 1;
-				printFlag = 0; 
-			}
-			//Miss
-			else
-			{
-				int x = fifo(queue, ref_bit, nPages);
-				queue[x] = len;
-				ref_bit[x] = 0; 
-
-				replace(frames, nFrames, x, seq[i]); 
+// 				replace(frames, nFrames, x, seq[i]); 
 				
-				queue[seq[i]] = i; 
-				missCount++; 
-			}
-		}
-		if(printFlag)
-		{
-			for(int j=0; j<nFrames; j++) {
-				if(frames[j] == -1) cout << "# "; 
-				else cout << frames[j] << " "; 
-			}
-			
-			cout << endl; 
-		}
-	}
+// 				queue[seq[i]] = i; 
+// 				missCount++; 
+// 			}
+// 		}
+// 		if(printFlag)
+// 		{
+// 			for(int j=0; j<nFrames; j++) {
+// 				if(frames[j] == -1) cout << "# "; 
+// 				else cout << frames[j] << " "; 
+// 			}
+// 			cout << endl; 
+// 		}
+// 	}
 
-	cout << "Second Chance total miss = " << missCount << endl; 
-}
+// 	cout << "Second Chance total miss = " << missCount << endl; 
+// }
 
 
-///////////////////////////////////////////////
-//	FIFO SECTION
-///////////////////////////////////////////////
+/***********************************************
+				FIFO SECTION
+***********************************************/
 
 /* First In First Out */ 
 void FIFO(int nFrames, int nPages, int *seq, int len) { 
