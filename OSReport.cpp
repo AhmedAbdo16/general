@@ -6,45 +6,59 @@ using namespace std;
 
 /* Leaset Recently Used */ 
 void LRU(int nFrames, int nPages, int *seq, int len); 
+
 /* Most Freq. Used */
 void MFU(int nFrames, int nPages, int *seq, int len);
+
 /* Optimal Algorithm */
 void OPT(int nFrames, int nPages, int *seq, int len); 
+
 /* Leaset Freq. Used */
 void LFU(int nFrames, int nPages, int *seq, int len);
-/* Second Chance Algorithm */ 
-void SCA(int nFrames, int nPages, int *seq, int len); 
+
 /* First In First Out */ 
 void FIFO(int nFrames, int nPages, int *seq, int len); 
 
 int main() { 
-    int seed, nPages, nFrames, lenOfSeq, *seq, algo_number, choose_another_alog; 
+    int seed;
+    //int nPages;
+    //int nFrames;
+    //int lenOfSeq; 
+    //int *seq;
+    int algo_number;
+    int choose_another_alog; 
 
-  	cout << "This Program Simulate Page Replacement Alogrithms\n"; 
-  	cout << "Enter Number Of Pages : "; cin >> nPages; 
-  	cout << "Enter Number Of Frames : "; cin >> nFrames; 
-  	cout << "Enter Length Of Sequence : "; cin >> lenOfSeq;  
-    cout << "Enter The Seed Of sreand (seed): "; cin >> seed; 
-    srand(seed); 
+	//cout << "This Program Simulate Page Replacement Alogrithms\n"; 
+  	//cout << "Enter Number Of Pages : "; cin >> nPages; 
+  	//cout << "Enter Number Of Frames : "; cin >> nFrames; 
+  	//cout << "Enter Length Of Sequence : "; cin >> lenOfSeq;  
+    //cout << "Enter The Seed Of sreand (seed): "; cin >> seed; 
+    //srand(seed); 
 
-    seq = new int[lenOfSeq]; 
+    //seq = new int[lenOfSeq]; 
 
-    for(int i=0; i<lenOfSeq; i++) { 
-        seq[i] = rand() % (nPages + 1); // 0<= rand() <= nPages 
-    }
+    //for(int i=0; i<lenOfSeq; i++) { 
+    //    seq[i] = rand() % (nPages + 1); // 0<= rand() <= nPages 
+    //}
+
+	//int seq[] = {1,2,3,1,4,5,2,1,2,6,7,3,2}; 
+	int seq[] = {7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1}; 
+	int lenOfSeq = sizeof(seq)/sizeof(int); 
+	int nFrames = 3; 
+	int nPages = 7; 
 
 
     do { 
 		cout<<"\n--------------------------------------"
-		<<"\nTo Run An Alogrithm Press Its Nubmer\n"
-		<<"\n1. FIFO Algorithm"
-		<<"\n2. LRU Algorithm"
-		<<"\n3. LFU Algorithm"
-		<<"\n4. MFU Algorithm"
-		<<"\n5. Optimal Algorithm"
-		<<"\n6. Second Chance Algorithm"; 	
-		cout<<"\n--------------------------------------\n"; 
-		cout << "Enter Algorithm Number: "; cin >> algo_number; 
+			<<"\nTo Run An Alogrithm Press Its Nubmer\n"
+			<<"\n1. FIFO Algorithm"
+			<<"\n2. LRU Algorithm"
+			<<"\n3. LFU Algorithm"
+			<<"\n4. MFU Algorithm"
+			<<"\n5. Optimal Algorithm" 
+			<<"\n--------------------------------------\n" 
+			<< "Enter Algorithm Number: "; 
+		cin >> algo_number; 
 
 		cout << endl; 
 		cout << "Seq. is: " << endl; 
@@ -58,7 +72,6 @@ int main() {
 			case 3: LFU(nFrames, nPages, seq, lenOfSeq); break; 
 			case 4: MFU(nFrames, nPages, seq, lenOfSeq); break; 
 			case 5: OPT(nFrames, nPages, seq, lenOfSeq); break; 
-			case 6: SCA(nFrames, nPages, seq, lenOfSeq); break; 
 			default: 
 				cout << "Enter Valid Nubmer" << endl; 
 		}
@@ -111,7 +124,8 @@ void replace(int *arr, int size, int ele1, int ele2)
 int min(int *map, int size) 
 { 
 	int min = 0;
-
+	
+	/* this starts from 1 as we mad min the zero index element */ 
 	for(int i=1; i<= size; i++) 
 	{
 		if(map[min] > map[i])  
@@ -127,28 +141,31 @@ void LRU(int nFrames, int nPages, int *seq, int len)
 { 
 	int missCount = 0, printFlag; 
 
-	int map[nPages+1]; 
-	for(int i=0; i<=nPages; i++) map[i] = len;  
+	int map[nPages+1]; // if No. of pages 7 we need 8 places to store numbers from 0 up to 7 
+	for(int i=0; i<=nPages; i++) map[i] = len; // filling the map array with numbers out of the range of expected mapping values    
 	// memset(map, len, sizeof(map));
 	
-
+	//real frames array, with size of nFrames, at the very begining of the program
+	//the filling indicator (framesSize = 0)  
 	int frames[nFrames], framesSize = 0; 
-	for(int i=0; i<nFrames; i++) frames[i] = -1;  
-
+	for(int i=0; i<nFrames; i++) frames[i] = -1; // puting a nubmer of of the range of possible values as know that values[0-n]  
+	
 	bool isFound; 
 
 	for(int i=0; i<len; i++) 
 	{
 		printFlag = 1; 
-		
+		//find the element of the sequence in the frames 
 		isFound = find(frames, framesSize, seq[i]);
-
+		//if the frames array still not compelety filled up 
 		if(framesSize < nFrames) 
 		{ 		
-			//Hit 
+			//Hit, element was found 
 			if(isFound == true) 
 			{ 
+				//update mp value with the new insertion index in sequence array 
 				map[seq[i]] = i;
+				//don't print anything 
 				printFlag = 0;
 			}
 			//Miss
@@ -157,32 +174,42 @@ void LRU(int nFrames, int nPages, int *seq, int len)
 				//new element insertion. 
 				frames[framesSize] = seq[i];
 				framesSize++; 
-
+				//change map[seq[i]] => say map of 5 to ith index, map[5] = i instead of len 
 				map[seq[i]] = i;
 				missCount++; //add +1 to total miss 
 			}  
 		}
 		
+		//array is filled, we need to earse an element to insert our new one in case of miss  
 		else 
 		{
 			//Hit 
 			if(isFound == true) 
 			{ 
+				//update map value for the ith element in sequence array with its values (note: that's what meant by mapping)
 				map[seq[i]] = i;
+				//print no thing 
 				printFlag = 0; 
 			} 
 			// 2. element isn't in the frames insert it and increase total miss counter 
 			// get the element that need to be removed and replace it with the new element
 			else 
 			{
+				//find the element with minimum index value (least recently used) the one with the loweset map[x] value 
+				// this element will be replaced by the newer one 
 				int lru = min(map, nPages); 
+				//set the map value for lru element to be out of range 
 				map[lru] = len;
+				//replace the lru by seq[i] in the frames array 
 				replace(frames, nFrames, lru, seq[i]); 
+				//update the newer element index value in map array 
 				map[seq[i]] = i; 
+				//miss count is increased 
 				missCount++;
 			}
 		}
 
+		//if the case was miss print the array to see the change 
 		if(printFlag) 
 		{
 			for(int j=0; j<nFrames; j++) 
@@ -193,48 +220,63 @@ void LRU(int nFrames, int nPages, int *seq, int len)
 			cout << endl;
 		}
 	}
+	
 	cout << "LRU total miss = " << missCount << endl; 
 } 
 
 /***********************************************
 				MFU SECTION
 ***********************************************/
+/**
+ *this algo. we use to method the first one is the traditional mru, in case there's no tie between to element 
+ *or more(elements to be erased from the frames array) 
+ *if there's a tie we use MRL method to avoid this situation 
+ */ 
 
-int *_max(int *freq, int size)
+//traditonal case
+//this function returns an array (a pointer to array of size 2 
+int *_max(int *freq, int size) 
 { 
 	//this function takes the freq array and get the max, if there is anther element with 
-	//the same max. flag is triggered to use LRU method 
+	//the same max. flag is triggered to use MFU method 
+	
+	/* max starts from index zero 
+	 * flag is an indicator to tie situation if there's two element with the same Freq to be removed 
+	 * this flag is used to trigger the second method (MRL) 
+	 */ 
 	int max = 0;
 	int flag = 0;
-
-	// cout << "\n--------------------------------------- << endl; 
-
+	
+	/* i starts from i as i took max with zero value */ 
 	for(int i=1; i<=size; i++) 
 	{ 
+		/* if the ith element freq > than recent max element value 
+		 * change max to be i and update the flag with = 0 
+		 */ 
 		if(freq[i] > freq[max]) 
 		{
 			max = i; 
 			flag = 0; 
 		}
+		/*if the ith element freq == the max element freq this a tie update flag with one 
+		*/ 
 		else if(freq[i] == freq[max]) { 
-			// cout << i << ", "; 
 			flag = 1;
 		}
 	}
-
-	// cout << "\nMax: " << max << " freq["<<max<<"] = " <<freq[max]<< " ,Flag: " << flag << endl; 
-	// cout << "\n--------------------------------------- << endl; 
-
-	int *max_flag = new int[2]; 
+	/*making an array to return the two values of the max and flag as array pointer */ 
+	int *max_flag = new int[2]; // won't work, unless the memory were dynamically allocated with new operator or c functions
 	max_flag[0] = max; 
 	max_flag[1] = flag; 
 	return max_flag; 
 }
 
+//mru case 
 int mru(int *map, int size)
 {
 	int max = 0; 
 	for(int i=0; i<=size; i++) { 
+	//if the ith element was entered after the max element, update max = i; 
 		if(map[i] > map[max]) max = i; 
 	}
 	return max; 
@@ -249,37 +291,50 @@ void MFU(int nFrames, int nPages, int *seq, int len)
 	*/
 	int missCount = 0, printFlag; 
 
+	//freq array to be used in the first approach the regular one
 	int freq[nPages+1];
+	//setting the starts from first element in the array to the last one with 0 value
+	//feel free to use for loop to fill the array, difference is in speed 
 	memset(freq, 0, sizeof(freq)); 
 	 
+	//MRU array to be used in the second appraoch 
 	int MRU[nPages+1]; 
-	memset(MRU, -1, sizeof(MRU)); 
+	//fill the MRU with -1 as indicator of emptencess 
+	for(int i=0; i<=nPages; i++) MRU[i] = -1; 
 
-	int frames[nFrames], framesSize = 0; 
+	//frames array 
+	int frames[nFrames], framesSize = 0;
+	//fill the frames with -1 also or any value out the range of used numbers, ex: could be nPages + 1;  
 	memset(frames, -1, sizeof(frames)); 
 
 	bool isFound; 
 
 	for(int i=0; i<len; i++) { 
-		// if the frames has not filled yet
-		
+		//lookup the element to be inserted if it already in the frames array 
 		isFound = find(frames, framesSize, seq[i]); 
 		printFlag = 1; 
-
+		// if the frames has not filled yet
 		if(framesSize < nFrames) {
 			//Hit: element to be inserted exist in the frames
 			if(isFound == true) 
 			{
+				//increase the appereance (MFU) by one 
 				freq[seq[i]]++; 
+				//update the MRU with the newer enternece index 
 				MRU[seq[i]] = i;
+				//print no thing 
 				printFlag = 0;  
 			}
 			//Miss: element doesn't exist 
 			else 
-			{ 
+			{
+				//miss insert this element in the frames 
 				frames[framesSize++] = seq[i];  
+				//appereance = 1; 
 				freq[seq[i]] = 1;
+				//MRU[x] = i; instead of -1 
 				MRU[seq[i]] = i; 
+				//increaes miss counter 
 				missCount++; 
 			}
 		}
@@ -299,8 +354,11 @@ void MFU(int nFrames, int nPages, int *seq, int len)
 			//Miss
 			else
 			{
+				//there's a need to remove an element 
+				//1.st check the regular method if available to use 
 				int *max_flag = _max(freq, nPages);
 				
+				//if flag == 1 // use the second case MRU
 				if(max_flag[1]) { 
 					//use MRU
 					int x_mru = mru(MRU, nPages); 
@@ -308,6 +366,7 @@ void MFU(int nFrames, int nPages, int *seq, int len)
 					freq[x_mru] = 0; 
 					replace(frames, nFrames, x_mru, seq[i]); 
 				}
+				//if not use MFU 
 				else 
 				{ 
 					//use MFU
@@ -315,15 +374,19 @@ void MFU(int nFrames, int nPages, int *seq, int len)
 					freq[max_flag[0]] = 0;
 					replace(frames, nFrames, max_flag[0], seq[i]); 
 				}
+				//make freq[x] = 1 instead of -1
 				freq[seq[i]] = 1;
+				//MRU = i instead of -1 
 				MRU[seq[i]] = i; 
 				missCount++;  
 			}
 		}
+		//if there's a change print the new frames array 
 		if(printFlag)
 		{
 			for(int j=0; j<nFrames; j++) 
 			{
+				//print # instead of -1 in case of empty frame field 
 				if(frames[j] == -1) cout << "# "; 
 				else cout << frames[j] << " "; 
 			}
@@ -338,26 +401,40 @@ void MFU(int nFrames, int nPages, int *seq, int len)
 /***********************************************
 				LFU SECTION
 ***********************************************/
-
+/*
+ *There're two approaches to handle LFU, just similar to MFU, with difference in using LRU instead MRU 
+ *In case there's no tie between the elements (meaning there's no two element, or more with the same 
+ *min freq use LFU 
+ *use LRU in caes of tie 
+ */
+ 
+/* returns an array of size two */ 
 int *lfu(int *freq, int size)
 { 
 	int min = 0, flag = 0;
 	
 	for(int i=1; i<=size; i++) 
 	{ 
+		//if freq[i] not equal to zero, meaning the element as appereaed at least once 
 		if(freq[i] != 0)
 		{ 
+			//if freq[min] == 0, update the min to be i immediately 
 			if(freq[min] == 0)
 			{ 
 				min = i; 
 				continue; 
 			}
+			//if min element was already appeared once 
+			//check if freq[i] < freq[min]
+			//if tree update min = i, flag = 0; 
 			else
 			if(freq[i] < freq[min])
 			{ 
 				min = i; 
 				flag = 0; 
 			}
+			//if not check if the min and i has the same times of appeareances[tie]
+			//update flag with = 1; 
 			else 
 			if(freq[i] == freq[min])
 			{ 
@@ -366,16 +443,21 @@ int *lfu(int *freq, int size)
 		}
 	}
 
+	//return the min_flag array pointer 
 	int *min_flag = new int[2]; 
 	min_flag[0] = min; 
 	min_flag[1] = flag; 
 	return min_flag; 
 }
+
+/* returns an integer value */ 
 int lru(int *lru, int*freq, int min_freq, int size)
 { 
-	// cout <<"-----------------"<<endl; 
-	// cout << "Min freq: " << min_freq << endl; 
 	int min = 0; 
+	/*
+	 *here we eleminate the element with the same min freq that was discovered in lfu function
+	 *we choose to delete the LRU one from among this set of elements 
+	 */
 	for(int i=1; i<=size; i++) 
 	{
 		//if by chance min was the page with min freq 
@@ -393,7 +475,7 @@ int lru(int *lru, int*freq, int min_freq, int size)
 			min = i; 
 		}
 	}
-	// cout <<"-----------------"<<endl; 
+	
 	return min; 
 }
 
@@ -401,21 +483,27 @@ int lru(int *lru, int*freq, int min_freq, int size)
 void LFU(int nFrames, int nPages, int *seq, int len) 
 { 
 	int missCount = 0, printFlag;
+	
+	//freq array 
 	int freq[nPages + 1];
-	memset(freq, 0, sizeof(freq)); 
+	//filling it with zero values 
+	for(int i=0; i<=nPages; i++) freq[i] = 0;
+	//memset(freq, 0, sizeof(freq)); 
 	 
 	int LRU[nPages + 1]; 
-	memset(LRU, len, sizeof(LRU)); 
+	for(int i=0; i<=nPages; i++) LRU[i] = len;
+	//memset(LRU, len, sizeof(LRU)); 
 
 	int frames[nFrames], framesSize = 0; 
-	memset(frames, -1, sizeof(frames)); 
+	for(int i=0; i<=nFrames; i++) frames[i] = -1;
+	//memset(frames, -1, sizeof(frames)); 
 
 	bool isFound; 
 
 	for(int i=0; i<len; i++) 
 	{ 
 		printFlag = 1; 
-
+		
 		isFound = find(frames, framesSize, seq[i]);  
 
 		if(framesSize < nFrames) 
@@ -450,6 +538,7 @@ void LFU(int nFrames, int nPages, int *seq, int len)
 			{ 
 				//try LFU if there's two elements with the leaset freq. use LRU. 
 				int *min_flag = lfu(freq, nPages); 
+				//if flag is 0 use LFU 
 				if(min_flag[1] == 0) 
 				{
 					// cout << "flag = 0" << endl; 
@@ -459,6 +548,7 @@ void LFU(int nFrames, int nPages, int *seq, int len)
 					freq[seq[i]]++; 
 					LRU[seq[i]] = i; 	
 				}
+				//use LRU 
 				else 
 				{ 
 					// cout << "flag = 1"<<endl; 
@@ -500,24 +590,25 @@ void LFU(int nFrames, int nPages, int *seq, int len)
 				OPT SECTION
 ***********************************************/
 
-/* Optimal */
+/* Optimal 
+ * in optimal approach will look up each element and its appereances in the future(in to be come indices of seq array) 
+ * to delete an element there're exactly 2 cases
+ * 1. to remove the one with no, or with the farest appereance in the future 
+ * 2. in case of there're to candidate to be delete delete any one of them, randomly  
+ */
 void OPT(int nFrames, int nPages, int *seq, int len) 
 {
-	//choose the the farest element in appearance to delete 
-	//if we have to element or more that will not appear use MRU element to delete 
-
 	int missCount = 0; 
 	int printFlag; 
 
+	//future checking array, to choose the one with farest index
 	int nearest_index[nPages + 1];
 	// memset(nearest_index, len, sizeof(nearest_index)); 
 	for(int i=0; i<=nPages; i++) nearest_index[i] = len; 
-
-	int MRU[nPages+1]; 
-	memset(MRU, -1, sizeof(MRU)); 
 	
 	int frames[nFrames], framesSize = 0; 
-	memset(frames, -1, sizeof(frames)); 
+	for(int i=0; i<=nFrames; i++) frames[i] = -1; 
+	//memset(frames, -1, sizeof(frames)); 
 
 	bool isFound; 
 
@@ -530,97 +621,76 @@ void OPT(int nFrames, int nPages, int *seq, int len)
 		//frames still has empty place 
 		if(framesSize < nFrames)
 		{
-
-			//hit
-			if(isFound == true) 
+			//miss
+			if(isFound != true) 
 			{
-				MRU[seq[i]] = i;
-				printFlag = 0; 
-			}
-			//miss 
-			else 
-			{	
 				frames[framesSize++] = seq[i]; 
-				MRU[seq[i]] = i; 
 				missCount++; 
 			}
+			//do nothing in case of hit
+			else printFlag = 0;  
 		}
 		//frames is full 
-		//we could use OPTIMAL or MRU here. 
+		//we could use OPTIMAL or random erasing here. 
 		else 
 		{
-			//hit 
-			if(isFound == true)
-			{
-				MRU[seq[i]] = i;
-				printFlag = 0;  
-			}
 			//miss 
-			else 
+			if(isFound != true)
 			{
-				//easy way to find nearest element to use two for lps 
-				//first one loop on frames and there inner one loops through seq form i - to len 
-				// of the seq if we find the element in the inner loop we break and store its index 
-				// the compare to find the farest one through its index  
-
+				int flag = 0; 
+				//loop for frames array 
 				for(int j=0; j<nFrames; j++) 
 				{
-					int flag = 0; 
+					flag = 0; 
+					//loop for seq array 
 					for(int k=i+1; k<len; k++)
 					{
+						//if the frame j is == seq [k]
 						if(frames[j] == seq[k]) 
 						{
+							// freme-J index in nearest index array with k
 							nearest_index[frames[j]] = k; 
 							flag = 1; 
 							break; 
 						}
 					}
+					//if the element don't appear in the future update its nearest index [frame-J] = len 
 					if(flag == 0) nearest_index[frames[j]] = len; 
 				}
 
-				int counter = 0;
-				int max = frames[0]; 
+				//counter incase there's a tie 
+				flag = -1;
+				int max = frames[0];
+
+				//find the one with farest apperance  
 				for(int j=1; j<nFrames; j++) 
 				{
 					if(nearest_index[frames[j]] > nearest_index[max])
 					{
-						max = frames[j]; 
+						max = frames[j];
+						flag = -1; 
 					} 
 					else 
 					if(nearest_index[frames[j]] == nearest_index[max]) 
 					{
-						counter++; 
+						flag = j;
+						//cout <<"J: " << j << endl;    
 					}
 				}
-
-
-				//if we have only one element that have the highest index in seq or out the seq in
-				//the range of (i : len) of seq we remove this element 
-				//counter == 0 if the element with the highest index in seq is the first element in frames counter will not be increased. 
-				// cout << "Counter : " << counter << endl; 
-
-				if((counter == 1) || (counter == 0)) 
+				//there's no tie 
+				if(flag == -1)
 				{ 
-					// cout<<"Counter == 1 or 0"<<endl;
-					// cout<<"Max = " << max << endl;  
-					replace(frames, nFrames, max, seq[i]);
-					MRU[seq[i]] = i;
-					MRU[max] = -1; 
-					nearest_index[max] = len;
+					replace(frames, nFrames, max, seq[i]); 
+					//cout << "Max: " << max << endl; 
 				}
-				//if we have more the one element the out the seq in the range (i : len), We use 
-				//MRU method to determined which element to be removed form the frames 
-				else 
-				{ 
-					// cout <<"Two or more elements out of range"<<endl; 
-					max = mru(MRU, nPages);
-					replace(frames, nFrames, max, seq[i]);
-					MRU[seq[i]] = i; 
-					MRU[max] = -1; 
-					nearest_index[max] = len;
+				//there's a tie remove the flag element
+				else {
+					replace(frames, nFrames, frames[flag], seq[i]);
+					//cout << "Flag: " << frames[flag] << endl;  
 				}
 				missCount++; 
 			}
+			else printFlag = 0; 
 		}
 		if(printFlag) 
 		{
@@ -632,133 +702,10 @@ void OPT(int nFrames, int nPages, int *seq, int len)
 			}
 			cout << endl; 
 		} 
-	}
+	}	
 
 	cout << "OPT total miss = " << missCount<< endl; 
 }
-
-
-// /***********************************************
-// 				SCA SECTION
-// ***********************************************/
-
-// int fifo(int *queue, int *ref_bit, int size)
-// { 
-// 	int min; 
-
-// 	//continue until we find element that doesn't have second chance to be removed. 
-// 	while(1) 
-// 	{ 
-// 		min = 0; 
-// 		for(int i=0; i<=size; i++) 
-// 		{ 
-// 			if((queue[min] > queue[i]) && (ref_bit[i] != -1))
-// 			{ 
-// 				min = i; 
-// 			}
-// 		}
-// 		//if ref_bit on, disable it. and loop again excluding it from the search next time by setting it to; 
-// 		if(ref_bit[min] == 1) 
-// 		{ 
-// 			ref_bit[min] = -1; 
-// 		}
-// 		else break; 
-// 	} 
-
-// 	for(int i=0; i<=size; i++) 
-// 	{ 
-// 		if(ref_bit[i] == -1) ref_bit[i] = 0; 
-// 	}
-
-// 	return min; 
-// }
-
-// /*Second Chance Algorithm */ 
-// void SCA(int nFrames, int nPages, int *seq, int len)
-// {
-// 	/* 
-// 	Second chance algorithm is a FIFO variant, as we give the repeated elements that chance chance to 
-// 	be in frames, 
-// 	Ex: if we have page 2 in our frames and we require 2 again while the first still in the frames 
-// 	we give the 2 second chance by enabling its second chance bit
-
-// 	when removing pages/elements we search for the first entered (FI) and replace it, it have its second
-// 	chance bit enable we disable it and look for the next in line and remove it.
-// 	*/
-	
-// 	int missCount = 0, printFlag; 
-	
-// 	int ref_bit[nPages +1]; // ref_bit : Second Chance Bit; 
-// 	memset(ref_bit, 0, sizeof(ref_bit)); 
-	
-// 	int queue[nPages + 1]; 
-// 	// memset(queue, len, sizeof(queue)); // as len out of the range of indeces
-// 	for(int i=0; i<=nPages; i++) queue[i] = len; 
-
-// 	int frames[nFrames], framesSize = 0; 
-// 	memset(frames, -1, sizeof(frames)); 
-
-// 	bool isFound; 
-
-// 	// set<int> frames; 
-// 	// set<int>::iterator isFound; 
-
-// 	for(int i=0; i<len; i++) 
-// 	{ 
-// 		printFlag = 1;
-
-// 		isFound = find(frames, framesSize, seq[i]); 
-
-// 		//frames is not full 
-// 		if(framesSize < nFrames) 
-// 		{
-// 			//hit 
-// 			if(isFound == true) 
-// 			{ 
-// 				ref_bit[seq[i]] = 1;
-// 				printFlag = 0; 
-// 			} 
-// 			//miss
-// 			else
-// 			{ 
-// 				frames[framesSize++] = seq[i];  
-// 				queue[seq[i]] = i;
-// 				missCount++;  
-// 			}
-// 		}
-// 		//frames is full 
-// 		else
-// 		{ 
-// 			//Hit 
-// 			if(isFound == true)
-// 			{ 
-// 				ref_bit[seq[i]] = 1;
-// 				printFlag = 0; 
-// 			}
-// 			//Miss
-// 			else
-// 			{
-// 				int x = fifo(queue, ref_bit, nPages);
-// 				queue[x] = len;
-
-// 				replace(frames, nFrames, x, seq[i]); 
-				
-// 				queue[seq[i]] = i; 
-// 				missCount++; 
-// 			}
-// 		}
-// 		if(printFlag)
-// 		{
-// 			for(int j=0; j<nFrames; j++) {
-// 				if(frames[j] == -1) cout << "# "; 
-// 				else cout << frames[j] << " "; 
-// 			}
-// 			cout << endl; 
-// 		}
-// 	}
-
-// 	cout << "Second Chance total miss = " << missCount << endl; 
-// }
 
 
 /***********************************************
@@ -769,11 +716,13 @@ void OPT(int nFrames, int nPages, int *seq, int len)
 void FIFO(int nFrames, int nPages, int *seq, int len) { 
 	int missCount = 0, printFlag; 
 	
+	//queue array
 	int queue[nPages + 1]; 
 	for(int i=0; i<=nPages; i++) queue[i] = len; 
-
+	
 	int frames[nFrames], framesSize =0; 
-	memset(frames, -1, sizeof(frames));  
+	for(int i=0; i<=nPages; i++) frames[i] = -1; 
+	//memset(frames, -1, sizeof(frames));  
 
 	bool isFound; 
 
